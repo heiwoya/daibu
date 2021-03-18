@@ -1,1 +1,1 @@
-# daibu
+# using by ownerself only
