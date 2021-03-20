@@ -3,7 +3,7 @@ name: bububao
 on:
   workflow_dispatch:
   schedule:
-     - cron: '*/30 * * * *'
+     - cron: '0 3 * * *'
   watch:
     types: started
 jobs:
