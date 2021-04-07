@@ -1,8 +1,8 @@
 /* ziye 
-github地址 https://github.com/6Svip120apk69
+github地址 https://github.com/ziye888
 TG频道地址  https://t.me/ziyescript
 TG交流群   https://t.me/joinchat/AAAAAE7XHm-q1-7Np-tF3g
-boxjs链接  https://raw.githubusercontent.com/6Svip120apk69/gitee_q8qsTAUA_cThxc1RBVUE/main/Task/ziye.boxjs.json
+boxjs链接  https://cdn.jsdelivr.net/gh/ziye888/JavaScript@main/Task/ziye.boxjs.json
 
 转载请备注个名字，谢谢
 
@@ -22,6 +22,8 @@ boxjs链接  https://raw.githubusercontent.com/6Svip120apk69/gitee_q8qsTAUA_cThx
 3.5 优化提现
 3.8 替换为循环获取ck
 3.13 修复0.3提现
+3.23 设置CASH为1000以上时则在23.59分执行1秒的循环提现，以此类推
+3.25 替换为await形式
 
 ⚠️ 时间设置    0,30 0-23 * * *    每天 35次以上就行   
 
@@ -51,17 +53,17 @@ hostname=bububao.duoshoutuan.com,
 
 ############## 圈x
 #步步宝获取TOKEN
-https:\/\/bububao\.duoshoutuan\.com\/user\/* url script-request-header https://raw.githubusercontent.com/6Svip120apk69/gitee_q8qsTAUA_cThxc1RBVUE/main/Task/bububao.js
+https:\/\/bububao\.duoshoutuan\.com\/user\/* url script-request-header https://cdn.jsdelivr.net/gh/ziye888/JavaScript@main/Task/bububao.js
 
 ############## loon
 #步步宝获取TOKEN
-http-response https:\/\/bububao\.duoshoutuan\.com\/user\/* script-path=https://raw.githubusercontent.com/6Svip120apk69/gitee_q8qsTAUA_cThxc1RBVUE/main/Task/bububao.js, requires-body=1,max-size=0, tag=步步宝获取TOKEN
+http-response https:\/\/bububao\.duoshoutuan\.com\/user\/* script-path=https://cdn.jsdelivr.net/gh/ziye888/JavaScript@main/Task/bububao.js, requires-body=1,max-size=0, tag=步步宝获取TOKEN
 
 ############## surge
 #步步宝获取TOKEN
-步步宝获取TOKEN = type=http-response,pattern=https:\/\/bububao\.duoshoutuan\.com\/user\/*,script-path=https://raw.githubusercontent.com/6Svip120apk69/gitee_q8qsTAUA_cThxc1RBVUE/main/Task/bububao.js
+步步宝获取TOKEN = type=http-response,pattern=https:\/\/bububao\.duoshoutuan\.com\/user\/*,script-path=https://cdn.jsdelivr.net/gh/ziye888/JavaScript@main/Task/bububao.js
 */
-GXRZ = '3.13 修复0.3提现'
+GXRZ = '3.25 替换为await形式'
 const $ = Env("步步宝");
 $.idx = ($.idx = ($.getval('bububaoSuffix') || '1') - 1) > 0 ? ($.idx + 1 + '') : ''; // 账号扩展字符
 const notify = $.isNode() ? require("./sendNotify") : ``;
@@ -280,9 +282,12 @@ if (isGetCookie) {
     $.done();
 } else {
     !(async () => {
+
         await all();
+
         await $.wait(1000)
         await msgShow();
+
     })()
     .catch((e) => {
             $.log('', `❌ ${$.name}, 失败! 原因: ${e}!`, '')
@@ -312,6 +317,7 @@ async function all() {
         header = {
             'tokenstr': `${bububaotokenVal}`,
             'idfa': ``,
+            'User-Agent' : `Mozilla/5.0 (Linux; U; Android 5.1.1; zh-CN; SM-J3109 Build/LMY47X) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/57.0.2987.108 UCBrowser/11.8.0.960 UWS/2.12.1.18 Mobile Safari/537.36 AliApp(TB/7.5.4) UCBS/2.11.1.1 WindVane/8.3.0 720X1280`,
             'ini': `21`,
             'store': `0`,
             'Content-Type': `application/x-www-form-urlencoded`,
@@ -324,37 +330,53 @@ async function all() {
             'Accept': `*/*`
         };
         O = (`${$.name + (i + 1)}🔔`);
-        await console.log(`-------------------------\n\n🔔开始运行【${$.name+(i+1)}】`)
-        let cookie_is_live = await user(); //用户名
-        if (!cookie_is_live) {
-            continue;
-        }
-        //await userjinbi() //收益记录
-        if (CZ >= 10) {
-            await help_index() //助力活动
-            await home() //首页信息
-            await jindan_click() //首页金蛋
-            await sign_html() //签到
-            await dk_info() //打卡
-            await cy_info() //答题
-            await water_info() //喝水
-            await sleep_info() //睡觉
-            await ggk() //刮刮卡
-            await $.wait(8000)
-            await lucky() //转盘抽奖
-            await $.wait(1000)
-            await lucky() //转盘抽奖
-            await $.wait(1000)
-            await lucky() //转盘抽奖
-            await $.wait(1000)
-            await h5_list() //看看赚
-            await news() //看文章
-            await renwu() //赚赚任务
-            await tixian_html() //提现
-        }
 
-        console.log(`${GXRZ}\n`);
-        $.message += `${GXRZ}\n`
+
+        if (CASH >= 1000&&nowTimes.getHours() === 23&&nowTimes.getMinutes() == 59) {
+            A = Date.now()
+            B = Date.now() + CASH
+            C= daytime()+86400000
+            while (Date.now() <= B) {
+              if (Date.now() >= C&&Date.now() <= C+3) {
+                CASH = 50
+                 await tixian()
+             }
+         }
+
+        } else {
+            await console.log(`-------------------------\n\n🔔开始运行【${$.name+(i+1)}】`)
+            let cookie_is_live = await user(); //用户名
+            if (!cookie_is_live) {
+                continue;
+            }
+            //await userjinbi() //收益记录
+            if (CZ >= 10) {
+                await help_index() //助力活动
+                await home() //首页信息
+                await jindan_click() //首页金蛋
+                await sign_html() //签到
+                await dk_info() //打卡
+                await cy_info() //答题
+                await water_info() //喝水
+                await sleep_info() //睡觉
+                await ggk() //刮刮卡
+                await $.wait(8000)
+                await lucky() //转盘抽奖
+                await $.wait(1000)
+                await lucky() //转盘抽奖
+                await $.wait(1000)
+                await lucky() //转盘抽奖
+                await $.wait(1000)
+                await h5_list() //看看赚
+                await news() //看文章
+                await renwu() //赚赚任务
+                await tixian_html() //提现
+            }
+
+            console.log(`${GXRZ}\n`);
+            $.message += `${GXRZ}\n`
+
+        }
 
     }
 }
@@ -367,7 +389,7 @@ function msgShow() {
         if (notifyInterval == 1) {
             $.msg($.name, ``, $.message);
         }
-        if (notifyInterval == 2 && (nowTimes.getHours() === 12 || nowTimes.getHours() === 21) && (nowTimes.getMinutes() >= 0 && nowTimes.getMinutes() <= 10)) {
+        if (notifyInterval == 2 && (nowTimes.getHours() === 12 || nowTimes.getHours() === 23) && (nowTimes.getMinutes() >= 0 && nowTimes.getMinutes() <= 10)) {
             $.msg($.name, ``, $.message);
         }
         if (notifyInterval == 3 && (nowTimes.getHours() === 6 || nowTimes.getHours() === 12 || nowTimes.getHours() === 18 || nowTimes.getHours() === 23) && (nowTimes.getMinutes() >= 0 && nowTimes.getMinutes() <= 10)) {
@@ -1749,7 +1771,7 @@ function tixian_html(timeout = 0) {
                             if (CASH > 0.3 && CASH <= 200 && $.user.money >= CASH) {
                                 await tixian() //提现
                             }
-                            if (CASH == 888) {
+                            if (CASH >= 888) {
                                 if ($.user.money >= 200 && fenshu5 && fenshu5 > 0) {
                                     CASH = 200
                                 } else if ($.user.money >= 100 && fenshu4 && fenshu4 > 0) {
@@ -1759,7 +1781,7 @@ function tixian_html(timeout = 0) {
                                 } else if ($.user.money >= 0.3 && $.user.day_jinbi >= 5000) {
                                     CASH = 0.3
                                 }
-                                if (CASH != 888) {
+                                if (CASH <= 888) {
                                     await tixian() //提现
                                 }
                             }
@@ -1790,6 +1812,9 @@ function tixian(timeout = 0) {
                     if ($.tixian.code == 1) {
                         console.log(`现金提现：${$.tixian.msg}\n`);
                         $.message += `【现金提现】：${$.tixian.msg}\n`;
+                    } else {
+                        console.log(`现金提现：${$.tixian.msg}\n`);
+                        $.message += `【现金提现】：${$.tixian.msg}\n`;
                     }
                 } catch (e) {
                     $.logErr(e, resp);
@@ -1800,6 +1825,8 @@ function tixian(timeout = 0) {
         }, timeout)
     })
 }
+
+
 // prettier-ignore
 function Env(t, e) {
     class s {
